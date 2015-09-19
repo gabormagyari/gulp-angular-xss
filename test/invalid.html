@@ -1,0 +1,14 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <title>Evil source</title>
+
+</head>
+<body>
+
+    <p ng-bind-html="bad xss">I'm not valid!</p>
+    <p ng-bind-html="really bad xss">I'm not valid too!</p>
+
+</body>
+</html>
