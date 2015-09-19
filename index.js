@@ -1,50 +1,85 @@
-var fs = require('fs');
-var gutil = require('gulp-util');
-var map = require('map-stream');
+(function () {
+    'use strict';
 
-function log(message, error) {
-    if (error) {
-        gutil.log(gutil.colors.red("error"), message);
-    } else {
-        gutil.log(message);
+    var fs = require("fs"),
+        gutil = require("gulp-util"),
+        through = require("through2"),
+        _ = require("lodash"),
+        colors = gutil.colors,
+        PluginError = gutil.PluginError;
+
+    function log(message, error) {
+        if (error) {
+            gutil.log(colors.red("error"), message);
+        } else {
+            gutil.log(message);
+        }
     }
-}
 
-var defaultOptions = {
-    logError: false,
-    exceptions: []
-};
-
-var angularXssPlugin = function(options) {
-
-    options = !options ? defaultOptions : {
-        logError: options.logError || defaultOptions.logError,
-        exceptions: options.exceptions || defaultOptions.exceptions
+    var defaultOptions = {
+        error: false,
+        exceptions: [],
+        supportedFilters: []
     };
 
-    return map(function(file, cb){
-        var fileContent = fs.readFileSync(file.path, "utf8");
-        var regExp = new RegExp("ng-bind-html=\".*\"", "ig");
+    function getActualOptions(options) {
+        return !options ? defaultOptions : {
+            error: options.error || defaultOptions.error,
+            exceptions: options.exceptions || defaultOptions.exceptions,
+            supportedFilters: options.supportedFilters || defaultOptions.supportedFilters
+        };
+    }
+
+    var analyzeNgBindHtml = function (file, content, options) {
+        var hasError = false;
+        var regExp = /ng-bind-html="[^"]*"/g;
         var match;
-        while ((match = regExp.exec(fileContent)) !== null) {
+        while ((match = regExp.exec(content))) {
+            var expression = match[0].replace("ng-bind-html=", "").replace(/"/g, "");
 
-                var value = match[0].substring(match[0].indexOf("ng-bind-html=") + 14, match[0].length - 1);
+            /* jshint loopfunc: true */
+            var filterMatch = function (filter) {
+                return new RegExp("|\s*" + filter + "\s*:").test(expression);
+            };
 
-                if (options.exceptions.length > 0) {
-                    for (var i = 0, len = options.exceptions.length; i < len; i++) {
-                        var exception = options.exceptions[i];
-                        if (exception.path !== file.relative || exception.value !== value) {
-                            log("Potential XSS in " + file.relative + ": " + value, options.logError);
-                        }
-                    }
-                } else {
-                    log("Potential XSS in " + file.relative + ": " + value, options.logError);
-                }
+            var exceptionMatch = function (exception) {
+                return exception.path === file.relative && exception.value === expression;
+            };
 
+            if (_.findIndex(options.supportedFilters, filterMatch) === -1 &&
+                _.findIndex(options.exceptions, exceptionMatch) === -1) {
+                log("Potential XSS in " + file.relative + ": " + match + "!", options.error);
+                hasError |= options.error;
+            }
         }
 
-        cb(null, file);
-    });
-};
+        return hasError;
+    };
 
-module.exports = angularXssPlugin;
+    var angularXssPlugin = function (options) {
+        options = getActualOptions(options);
+        var hasError = false;
+        return through.obj(function (file, encoding, callback) {
+            if (file.isStream()) {
+                this.emit("error", new PluginError("gulp-angular-xss", "Streams are not supported."));
+                return callback();
+            }
+
+            if (file.isBuffer()) {
+                var fileContent = file.contents.toString();
+                if (analyzeNgBindHtml.call(this, file, fileContent, options)){
+                    hasError = true;
+                }
+            }
+
+            this.push(file);
+            callback();
+        }, function(){
+            if (hasError) {
+                this.emit("error", new PluginError("gulp-angular-xss", "At least one potential XSS found!"));
+            }
+        });
+    };
+
+    module.exports = angularXssPlugin;
+}());
