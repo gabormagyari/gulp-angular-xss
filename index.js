@@ -32,14 +32,14 @@
 
     var analyzeNgBindHtml = function (file, content, options) {
         var hasError = false;
-        var regExp = /ng-bind-html="[^"]*"/g;
-        var match;
-        while ((match = regExp.exec(content))) {
-            var expression = match[0].replace("ng-bind-html=", "").replace(/"/g, "");
+        var regExp = /\b(?:data-)?ng-bind-html\s*=\s*(?:"([^"]*)"|'([^']*)')/gi;
+        var matches;
+        while ((matches = regExp.exec(content))) {
+            var expression = matches[1] !== undefined ? matches[1] : matches[2];
 
             /* jshint loopfunc: true */
             var filterMatch = function (filter) {
-                return new RegExp("[|]\\s*" + filter + "\\s*:").test(expression);
+                return new RegExp("[|]\\s*" + filter + "\\b").test(expression);
             };
 
             var exceptionMatch = function (exception) {
@@ -48,7 +48,7 @@
 
             if (_.findIndex(options.supportedFilters, filterMatch) === -1 &&
                 _.findIndex(options.exceptions, exceptionMatch) === -1) {
-                log("Potential XSS in " + file.relative + ": " + match + "!", options.error);
+                log("Potential XSS in " + file.relative + ": " + matches[0] + "!", options.error);
                 hasError |= options.error;
             }
         }
