@@ -1,5 +1,5 @@
 # gulp-angular-xss
-Anti-xss gulp plugin for angular. Prohibits the use of ng-bind-html.
+Anti-xss gulp plugin for angular. Optionally prohibits the use of ng-bind-html.
 
 First install gulp-angular-xss
 ```shell
@@ -20,12 +20,18 @@ Options:
 gulp.task('invalidWithExceptionAndFilter', function () {
     gulp.src('invalid.html')
         .pipe(xss({
+            // treat matches as error
             error: false,
+            // filter out based on file path and value
             exceptions: [
-                {path: "invalid.html", value: "badXss"},
-                {path: "invalid.html", value: "reallyBadXss"}
+                // ng-bind-html="badXss" from invalid.html will be filtered out
+                {path: "invalid.html", value: "badXss"}
             ],
-            supportedFilters: ["myfilter"]
+            // filter out based on filter value
+            supportedFilters: [
+                // attributes like ng-bind-html="something | myfilter: something" will be filtered out
+                "myfilter"
+            ]
         }));
 });
 ```
