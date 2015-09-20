@@ -8,32 +8,32 @@
 
     gulp.task('valid', function () {
         gutil.log("No lines expected:");
-        return gulp.src('valid.html')
+        return gulp.src('**/valid.html')
             .pipe(xss());
     });
 
     gulp.task('invalid', function () {
         gutil.log("Three lines are expected:");
-        return gulp.src('invalid.html')
+        return gulp.src('**/invalid.html')
             .pipe(xss());
     });
 
     gulp.task('invalidWithExceptions', function () {
         gutil.log("No lines expected:");
-        return gulp.src('invalid.html')
+        return gulp.src('**/invalid.html')
             .pipe(xss({
                 error: false,
                 exceptions: [
-                    {path: "invalid.html", value: "badXss"},
-                    {path: "invalid.html", value: "reallyBadXss"},
-                    {path: "invalid.html", value: "badXssWithFilter|myfilter:badXssWithFilter"}
+                    {path: "testfiles/invalid.html", value: "badXss"},
+                    {path: "testfiles/invalid.html", value: "reallyBadXss"},
+                    {path: "testfiles/invalid.html", value: "badXssWithFilter|myfilter:badXssWithFilter"}
                 ]
             }));
     });
 
     gulp.task('invalidWithFilters', function () {
         gutil.log("Two lines are expected:");
-        return gulp.src('invalid.html')
+        return gulp.src('**/invalid.html')
             .pipe(xss({
                 error: false,
                 supportedFilters: ["myfilter"]
@@ -42,12 +42,12 @@
 
     gulp.task('invalidWithExceptionsAndFilters', function () {
         gutil.log("No lines expected:");
-        return gulp.src('invalid.html')
+        return gulp.src('**/invalid.html')
             .pipe(xss({
                 error: false,
                 exceptions: [
-                    {path: "invalid.html", value: "badXss"},
-                    {path: "invalid.html", value: "reallyBadXss"}
+                    {path: "testfiles/invalid.html", value: "badXss"},
+                    {path: "testfiles/invalid.html", value: "reallyBadXss"}
                 ],
                 supportedFilters: ["myfilter"]
             }));
@@ -55,7 +55,7 @@
 
     gulp.task('invalidWithError', function () {
         gutil.log("Error expected");
-        return gulp.src('invalid.html')
+        return gulp.src('**/invalid.html')
             .pipe(xss({error: true}));
     });
 

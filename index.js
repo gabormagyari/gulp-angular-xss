@@ -43,7 +43,7 @@
             };
 
             var exceptionMatch = function (exception) {
-                return exception.path === file.relative && exception.value === expression;
+                return exception.path.replace(/\\/g, "/") === file.relative.replace(/\\/g, "/") && exception.value === expression;
             };
 
             if (_.findIndex(options.supportedFilters, filterMatch) === -1 &&
