@@ -1,6 +1,6 @@
 {
   "name": "gulp-angular-xss",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Anti xss gulp plugin for angular",
   "main": "index.js",
   "repository": {
@@ -16,7 +16,7 @@
   ],
   "author": "mgabor <blackcolt6@gmail.com>",
   "contributors": [{
-    "name": "kazhu"
+    "name": "kazhu <kaz@kaz.hu>"
   }],
   "license": "MIT",
   "dependencies": {

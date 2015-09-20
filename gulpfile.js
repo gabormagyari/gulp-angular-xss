@@ -17,9 +17,5 @@
             .pipe(jshint.reporter('jshint-stylish'));
     });
 
-    gulp.task('test', function(){
-
-    });
-
     gulp.task('develop', ['jshint']);
 }());

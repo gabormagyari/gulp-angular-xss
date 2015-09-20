@@ -74,10 +74,11 @@
 
             this.push(file);
             callback();
-        }, function(){
+        }, function(callback){
             if (hasError) {
                 this.emit("error", new PluginError("gulp-angular-xss", "At least one potential XSS found!"));
             }
+            callback();
         });
     };
 
