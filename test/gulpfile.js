@@ -2,15 +2,25 @@
     "use strict";
 
     var gulp = require('gulp'),
+        runSequence = require('run-sequence'),
+        gutil = require('gulp-util'),
         xss = require('../index');
 
     gulp.task('valid', function () {
-        gulp.src('valid.html')
+        gutil.log("No lines expected:");
+        return gulp.src('valid.html')
             .pipe(xss());
     });
 
-    gulp.task('invalidWithException', function () {
-        gulp.src('invalid.html')
+    gulp.task('invalid', function () {
+        gutil.log("Three lines are expected:");
+        return gulp.src('invalid.html')
+            .pipe(xss());
+    });
+
+    gulp.task('invalidWithExceptions', function () {
+        gutil.log("No lines expected:");
+        return gulp.src('invalid.html')
             .pipe(xss({
                 error: false,
                 exceptions: [
@@ -21,8 +31,18 @@
             }));
     });
 
-    gulp.task('invalidWithExceptionAndFilter', function () {
-        gulp.src('invalid.html')
+    gulp.task('invalidWithFilters', function () {
+        gutil.log("Two lines are expected:");
+        return gulp.src('invalid.html')
+            .pipe(xss({
+                error: false,
+                supportedFilters: ["myfilter"]
+            }));
+    });
+
+    gulp.task('invalidWithExceptionsAndFilters', function () {
+        gutil.log("No lines expected:");
+        return gulp.src('invalid.html')
             .pipe(xss({
                 error: false,
                 exceptions: [
@@ -33,16 +53,13 @@
             }));
     });
 
-    gulp.task('invalid', function () {
-        gulp.src('invalid.html')
-            .pipe(xss());
-    });
-
     gulp.task('invalidWithError', function () {
-        gulp.src('invalid.html')
+        gutil.log("Error expected");
+        return gulp.src('invalid.html')
             .pipe(xss({error: true}));
     });
 
-    gulp.task('default', ['valid', 'invalidWithException', 'invalidWithExceptionAndFilter', 'invalid'], function(){
+    gulp.task('default', function (callback) {
+        runSequence('valid', 'invalid', 'invalidWithExceptions', 'invalidWithFilters', 'invalidWithExceptionsAndFilters', callback);
     });
 }());

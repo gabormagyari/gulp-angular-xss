@@ -1,6 +1,6 @@
 {
   "name": "gulp-angular-xss",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Anti xss gulp plugin for angular",
   "main": "index.js",
   "repository": {
@@ -28,6 +28,7 @@
   "devDependencies": {
     "gulp": "",
     "gulp-jshint": "",
-    "jshint-stylish": ""
+    "jshint-stylish": "",
+    "run-sequence": ""
   }
 }

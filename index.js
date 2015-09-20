@@ -39,7 +39,7 @@
 
             /* jshint loopfunc: true */
             var filterMatch = function (filter) {
-                return new RegExp("|\s*" + filter + "\s*:").test(expression);
+                return new RegExp("[|]\\s*" + filter + "\\s*:").test(expression);
             };
 
             var exceptionMatch = function (exception) {
