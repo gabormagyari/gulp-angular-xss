@@ -1,6 +1,6 @@
 {
   "name": "gulp-angular-xss",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Anti xss gulp plugin for angular",
   "main": "index.js",
   "repository": {
@@ -10,13 +10,21 @@
   "keywords": [
     "gulp",
     "plugin",
+    "gulpplugin",
     "angular",
     "xss"
   ],
   "author": "Gabor Magyari",
   "license": "MIT",
   "dependencies": {
+    "fs": "^0.0.2",
     "gulp-util": "^3.0.6",
-    "map-stream": "0.0.6"
+    "lodash": "^3.10.1",
+    "through2": "^2.0.0"
+  },
+  "devDependencies": {
+    "gulp": "",
+    "gulp-jshint": "",
+    "jshint-stylish": ""
   }
 }
